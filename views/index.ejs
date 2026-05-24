@@ -73,14 +73,17 @@
     </div>
 <script>
   window.onload = function() {
-    // Scrolls 0 pixels to the right, and 300 pixels down
-    window.scrollTo({
-      left: 0,
-      top: 300, 
-      behavior: 'smooth'
-    });
+    // Delays the action by 1000 milliseconds (1 second)
+    setTimeout(function() {
+      window.scrollTo({
+        left: 0,
+        top: 750, // Increased 2.5x from 300 pixels
+        behavior: 'smooth'
+      });
+    }, 1000); 
   };
 </script>
+
 
   </body>
 </html>
