@@ -2,6 +2,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
+const path = require("path");
 require("dotenv").config();
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -84,7 +85,8 @@ async function getCloudinaryCasts() {
 
 //register view engine
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
 //page routes
