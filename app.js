@@ -6,6 +6,7 @@ const path = require("path");
 require("dotenv").config();
 
 const upload = multer({ storage: multer.memoryStorage() });
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
 
 //setting up the server using express
 const app = express();
@@ -19,7 +20,7 @@ if (process.env.NODE_ENV !== "production") {
 
 //cloudinary setup
 cloudinary.config({
-  cloud_name: "dqccntlcw",
+  cloud_name: cloudName,
   secure: true,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
@@ -87,6 +88,7 @@ async function getCloudinaryCasts() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 //page routes
@@ -101,7 +103,44 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/Add-cast", (req, res) => {
-  res.render("add", { title: "New cast" });
+  res.render("add", {
+    title: "New cast",
+    cloudName,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  });
+});
+
+app.post("/cloudinary-signature", (req, res) => {
+  if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return res.status(500).json({ error: "Cloudinary is not configured." });
+  }
+
+  const timestamp = Math.round(Date.now() / 1000);
+  const folder = "voidcast";
+  const caption = (req.body.caption || "").trim();
+  const context = caption ? `caption=${caption}` : undefined;
+  const paramsToSign = {
+    folder,
+    timestamp,
+  };
+
+  if (context) {
+    paramsToSign.context = context;
+  }
+
+  const signature = cloudinary.utils.api_sign_request(
+    paramsToSign,
+    process.env.CLOUDINARY_API_SECRET,
+  );
+
+  res.json({
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName,
+    context,
+    folder,
+    signature,
+    timestamp,
+  });
 });
 
 app.post("/", upload.single("uploadedFile"), async (req, res) => {

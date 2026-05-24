@@ -29,6 +29,7 @@
           action="/"
           method="POST"
           enctype="multipart/form-data"
+          data-cloud-name="<%= cloudName %>"
         >
           <label for="caption">Cast caption</label>
           <input id="caption" name="caption" placeholder="Signal title" />
@@ -43,10 +44,80 @@
           />
 
           <button type="submit">Upload Cast</button>
+          <p class="form-message" role="status" aria-live="polite"></p>
         </form>
       </main>
     </div>
 
-  </script>
+    <script>
+      const form = document.querySelector(".upload-form");
+      const button = form.querySelector("button");
+      const message = form.querySelector(".form-message");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const fileInput = form.querySelector("#uploadedFile");
+        const captionInput = form.querySelector("#caption");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          message.textContent = "Please choose a file to upload.";
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Uploading...";
+        message.textContent = "Sending cast to Cloudinary.";
+
+        try {
+          const signatureResponse = await fetch("/cloudinary-signature", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              caption: captionInput.value,
+            }),
+          });
+
+          const signatureData = await signatureResponse.json();
+
+          if (!signatureResponse.ok) {
+            throw new Error(signatureData.error || "Could not prepare upload.");
+          }
+
+          const uploadData = new FormData();
+          uploadData.append("file", file);
+          uploadData.append("api_key", signatureData.apiKey);
+          uploadData.append("timestamp", signatureData.timestamp);
+          uploadData.append("folder", signatureData.folder);
+          uploadData.append("signature", signatureData.signature);
+
+          if (signatureData.context) {
+            uploadData.append("context", signatureData.context);
+          }
+
+          const uploadResponse = await fetch(
+            `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/auto/upload`,
+            {
+              method: "POST",
+              body: uploadData,
+            },
+          );
+          const uploadResult = await uploadResponse.json();
+
+          if (!uploadResponse.ok) {
+            throw new Error(uploadResult.error?.message || "Upload failed.");
+          }
+
+          window.location.href = "/";
+        } catch (error) {
+          message.textContent = error.message;
+          button.disabled = false;
+          button.textContent = "Upload Cast";
+        }
+      });
+    </script>
   </body>
 </html>
