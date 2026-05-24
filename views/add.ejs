@@ -26,9 +26,6 @@
 
         <form
           class="upload-form"
-          action="/"
-          method="POST"
-          enctype="multipart/form-data"
           data-cloud-name="<%= cloudName %>"
         >
           <label for="caption">Cast caption</label>
@@ -43,7 +40,7 @@
             required
           />
 
-          <button type="submit">Upload Cast</button>
+          <button type="button">Upload Cast</button>
           <p class="form-message" role="status" aria-live="polite"></p>
         </form>
       </main>
@@ -54,9 +51,7 @@
       const button = form.querySelector("button");
       const message = form.querySelector(".form-message");
 
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
+      async function uploadCast() {
         const fileInput = form.querySelector("#uploadedFile");
         const captionInput = form.querySelector("#caption");
         const file = fileInput.files[0];
@@ -117,6 +112,12 @@
           button.disabled = false;
           button.textContent = "Upload Cast";
         }
+      }
+
+      button.addEventListener("click", uploadCast);
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        uploadCast();
       });
     </script>
   </body>
