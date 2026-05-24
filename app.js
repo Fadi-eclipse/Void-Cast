@@ -1,11 +1,9 @@
 //imports
 const express = require("express");
 const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
 const path = require("path");
 require("dotenv").config();
 
-const upload = multer({ storage: multer.memoryStorage() });
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
 
 //setting up the server using express
@@ -25,30 +23,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-function uploadToCloudinary(fileBuffer, caption) {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "voidcast",
-        resource_type: "auto",
-        context: {
-          caption: caption,
-        },
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-
-        resolve(result);
-      },
-    );
-
-    stream.end(fileBuffer);
-  });
-}
 
 async function getCloudinaryCasts() {
   const resourceTypes = ["image", "raw", "video"];
@@ -143,19 +117,8 @@ app.post("/cloudinary-signature", (req, res) => {
   });
 });
 
-app.post("/", upload.single("uploadedFile"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).send("Please choose a file to upload.");
-    }
-
-    await uploadToCloudinary(req.file.buffer, req.body.caption);
-
-    res.redirect("/");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Upload failed. Please try again.");
-  }
+app.post("/", (req, res) => {
+  res.status(410).send("Uploads must go directly to Cloudinary.");
 });
 
 module.exports = app;
