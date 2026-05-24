@@ -11,48 +11,66 @@
     <div class="page-shell">
       <header class="site-header">
         <a class="brand" href="/">
-          <span>Void Cast</span>
+          <span class="brand-name"><span>Void</span> <span>Cast</span></span>
         </a>
 
         <a class="action-link" href="/Add-cast">Add cast</a>
       </header>
 
       <main>
-        <section class="hero-panel">
-          <div>
-
-            <h1>Media archive</h1>
+        <section class="hero-panel home-hero">
+          <div class="hero-content">
+            <h1>Cast into the void</h1>
           </div>
-          <p class="count-stamp"><%= casts.length %> uploaded</p>
+
+          <div class="hero-stats" aria-label="Upload stats">
+
+            </div>
+          </div>
         </section>
 
         <% if (casts.length === 0) { %>
           <section class="empty-state">
-            <p>No uploads yet.</p>
+            <div>
+              <p class="eyebrow">No signal found</p>
+              <h2>No uploads yet.</h2>
+            </div>
             <a class="action-link" href="/Add-cast">Create first cast</a>
           </section>
         <% } %>
 
-        <section class="cast-grid" aria-label="Uploaded casts">
-          <% casts.forEach((cast) => { %>
-            <article class="cast-card">
-              <div class="media-frame">
-                <% if (cast.resourceType === "image") { %>
-                  <img src="<%= cast.url %>" alt="<%= cast.caption %>" />
-                <% } else if (cast.resourceType === "video") { %>
-                  <video src="<%= cast.url %>" controls preload="metadata"></video>
-                <% } else { %>
-                  <a class="file-preview" href="<%= cast.url %>" target="_blank">
-                    <strong>Open uploaded file</strong>
-                  </a>
-                <% } %>
-              </div>
-              <div class="cast-copy">
-                <h2><%= cast.caption %></h2>
-              </div>
-            </article>
-          <% }) %>
-        </section>
+        <% if (casts.length > 0) { %>
+          <section class="library-header">
+            <div>
+              <p class="eyebrow">Latest transmissions</p>
+              <h2>Upload library</h2>
+            </div>
+          </section>
+
+          <section class="cast-grid" aria-label="Uploaded casts">
+            <% casts.forEach((cast) => { %>
+              <article class="cast-card">
+                <div class="media-frame">
+                  <span class="type-badge"><%= cast.resourceType %></span>
+                  <% if (cast.resourceType === "image") { %>
+                    <img src="<%= cast.url %>" alt="<%= cast.caption %>" />
+                  <% } else if (cast.resourceType === "video") { %>
+                    <video src="<%= cast.url %>" controls preload="metadata"></video>
+                  <% } else { %>
+                    <a class="file-preview" href="<%= cast.url %>" target="_blank">
+                      <span><%= cast.format || "file" %></span>
+                      <strong>Open file</strong>
+                    </a>
+                  <% } %>
+                </div>
+                <div class="cast-copy">
+                  <h3><%= cast.caption %></h3>
+                  <a href="<%= cast.url %>" target="_blank">Open source</a>
+                </div>
+              </article>
+            <% }) %>
+          </section>
+        <% } %>
       </main>
     </div>
   </body>

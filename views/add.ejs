@@ -11,7 +11,7 @@
     <div class="page-shell">
       <header class="site-header">
         <a class="brand" href="/">
-          <span>Void Cast</span>
+          <span class="brand-name"><span>Void</span> <span>Cast</span></span>
         </a>
 
         <a class="ghost-link" href="/">All casts</a>
@@ -19,7 +19,7 @@
 
       <main class="form-layout">
         <section class="hero-panel upload-hero">
-          <div>
+          <div class="hero-content">
             <h1>Add cast</h1>
           </div>
         </section>
@@ -31,11 +31,7 @@
           enctype="multipart/form-data"
         >
           <label for="caption">Cast caption</label>
-          <input
-            id="caption"
-            name="caption"
-            placeholder="Give this cast a name"
-          />
+          <input id="caption" name="caption" placeholder="Signal title" />
 
           <label for="uploadedFile">Cast file</label>
           <input
