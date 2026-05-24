@@ -46,5 +46,14 @@
         </form>
       </main>
     </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      // Creates a square SVG with the text "VC" centered inside it
+      link.href = 'data:image/svg+xml,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><text y=".9em" font-size="90" font-family="sans-serif" font-weight="bold" fill="%23000000">VC</text></svg>';
+      document.head.appendChild(link);
+    });
+  </script>
   </body>
 </html>
