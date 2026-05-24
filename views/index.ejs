@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Void Cast</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span>Void Cast</span>
+        </a>
+
+        <a class="action-link" href="/Add-cast">Add cast</a>
+      </header>
+
+      <main>
+        <section class="hero-panel">
+          <div>
+
+            <h1>Media archive</h1>
+          </div>
+          <p class="count-stamp"><%= casts.length %> uploaded</p>
+        </section>
+
+        <% if (casts.length === 0) { %>
+          <section class="empty-state">
+            <p>No uploads yet.</p>
+            <a class="action-link" href="/Add-cast">Create first cast</a>
+          </section>
+        <% } %>
+
+        <section class="cast-grid" aria-label="Uploaded casts">
+          <% casts.forEach((cast) => { %>
+            <article class="cast-card">
+              <div class="media-frame">
+                <% if (cast.resourceType === "image") { %>
+                  <img src="<%= cast.url %>" alt="<%= cast.caption %>" />
+                <% } else if (cast.resourceType === "video") { %>
+                  <video src="<%= cast.url %>" controls preload="metadata"></video>
+                <% } else { %>
+                  <a class="file-preview" href="<%= cast.url %>" target="_blank">
+                    <span><%= cast.format || "file" %></span>
+                    <strong>Open uploaded file</strong>
+                  </a>
+                <% } %>
+              </div>
+              <div class="cast-copy">
+                <p class="eyebrow"><%= cast.resourceType %></p>
+                <h2><%= cast.caption %></h2>
+              </div>
+            </article>
+          <% }) %>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

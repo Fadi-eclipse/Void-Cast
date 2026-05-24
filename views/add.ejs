@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> | Void Cast</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span>Void Cast</span>
+        </a>
+
+        <a class="ghost-link" href="/">All casts</a>
+      </header>
+
+      <main class="form-layout">
+        <section class="hero-panel upload-hero">
+          <div>
+            <h1>Add cast</h1>
+          </div>
+        </section>
+
+        <form
+          class="upload-form"
+          action="/"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <label for="caption">Cast caption</label>
+          <input
+            id="caption"
+            name="caption"
+            placeholder="Give this cast a name"
+          />
+
+          <label for="uploadedFile">Cast file</label>
+          <input
+            id="uploadedFile"
+            type="file"
+            name="uploadedFile"
+            accept="image/*,video/*,application/pdf"
+            required
+          />
+
+          <button type="submit">Upload Cast</button>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>
