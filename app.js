@@ -32,7 +32,7 @@ function uploadToCloudinary(fileBuffer, caption) {
         folder: "voidcast",
         resource_type: "auto",
         context: {
-          caption: caption || "Untitled cast",
+          caption: caption,
         },
       },
       (error, result) => {
