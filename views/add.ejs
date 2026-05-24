@@ -27,7 +27,7 @@
 
         <form
           class="upload-form"
-          onsubmit="return false"
+          onsubmit="return false;"
           data-cloud-name="<%= cloudName %>"
           data-upload-mode="cloudinary-direct-v2"
         >
@@ -69,7 +69,6 @@
 
         button.disabled = true;
         button.textContent = "Uploading...";
-        message.textContent = "Sending cast directly to Cloudinary.";
 
         try {
           const signatureResponse = await fetch("/cloudinary-signature", {
