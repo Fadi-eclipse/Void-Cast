@@ -8,9 +8,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 //setting up the server using express
 const app = express();
-const server = app.listen(2000, () => {
-  console.log("listening on port 2000");
-});
+const port = process.env.PORT || 2000;
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+  });
+}
 
 //cloudinary setup
 cloudinary.config({
@@ -112,3 +116,5 @@ app.post("/", upload.single("uploadedFile"), async (req, res) => {
     res.status(500).send("Upload failed. Please try again.");
   }
 });
+
+module.exports = app;

@@ -43,13 +43,11 @@
                   <video src="<%= cast.url %>" controls preload="metadata"></video>
                 <% } else { %>
                   <a class="file-preview" href="<%= cast.url %>" target="_blank">
-                    <span><%= cast.format || "file" %></span>
                     <strong>Open uploaded file</strong>
                   </a>
                 <% } %>
               </div>
               <div class="cast-copy">
-                <p class="eyebrow"><%= cast.resourceType %></p>
                 <h2><%= cast.caption %></h2>
               </div>
             </article>
