@@ -2,6 +2,7 @@
 const express = require("express");
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
@@ -15,6 +16,19 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`listening on port ${port}`);
   });
 }
+
+//db connection
+const dbURI =
+  "mongodb+srv://fadikaizen:zxcvbnm123@auth-cluster.1nfzlys.mongodb.net/?appName=auth-cluster";
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(dbURI);
+    console.log("Connected to MongoDB successfully!");
+  } catch (error) {
+    console.error("Connection error:", error);
+  }
+};
 
 //cloudinary setup
 cloudinary.config({
