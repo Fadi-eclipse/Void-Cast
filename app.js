@@ -3,6 +3,7 @@ const express = require("express");
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const mongoose = require("mongoose");
+const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
@@ -11,23 +12,14 @@ const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
 const app = express();
 const port = process.env.PORT || 2000;
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
-    console.log(`listening on port ${port}`);
-  });
-}
-
 //db connection
 const dbURI =
+  process.env.MONGODB_URI ||
   "mongodb+srv://fadikaizen:zxcvbnm123@auth-cluster.1nfzlys.mongodb.net/?appName=auth-cluster";
 
 const connectDB = async () => {
-  try {
-    await mongoose.connect(dbURI);
-    console.log("Connected to MongoDB successfully!");
-  } catch (error) {
-    console.error("Connection error:", error);
-  }
+  await mongoose.connect(dbURI);
+  console.log("Connected to MongoDB successfully!");
 };
 
 //cloudinary setup
@@ -76,7 +68,7 @@ async function getCloudinaryCasts() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json({ limit: "16kb" }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //page routes
@@ -131,8 +123,23 @@ app.post("/cloudinary-signature", (req, res) => {
   });
 });
 
+app.use(authRoutes);
+
 app.post("/", (req, res) => {
   res.status(410).send("Uploads must go directly to Cloudinary.");
 });
+
+if (process.env.NODE_ENV !== "production") {
+  connectDB()
+    .then(() => {
+      app.listen(port, () => {
+        console.log(`listening on port ${port}`);
+      });
+    })
+    .catch((error) => {
+      console.error("Connection error:", error);
+      process.exit(1);
+    });
+}
 
 module.exports = app;

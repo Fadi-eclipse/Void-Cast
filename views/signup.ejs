@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Void Cast</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <div class="page-shell auth-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span class="brand-name"><span>Void</span> <span>Cast</span></span>
+        </a>
+
+        <a class="ghost-link" href="/login">Login</a>
+      </header>
+
+      <main class="auth-layout">
+        <form class="auth-form" action="/signup" method="POST">
+          <div class="auth-form-header">
+            <h2>Create account</h2>
+          </div>
+
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            placeholder="Choose a password"
+            autocomplete="new-password"
+            required
+          />
+
+          <button type="submit">Sign Up</button>
+
+          <p class="auth-switch">
+            Already have an account?
+            <a href="/login">Login instead</a>
+          </p>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>
