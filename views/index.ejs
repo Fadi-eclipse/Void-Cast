@@ -25,7 +25,6 @@
 
           <div class="hero-stats" aria-label="Upload stats">
 
-            </div>
           </div>
         </section>
 
@@ -46,11 +45,15 @@
             </div>
           </section>
 
-          <section class="cast-grid" aria-label="Uploaded casts">
+          <section class="cast-grid" data-cast-grid aria-label="Uploaded casts">
             <% casts.forEach((cast) => { %>
-              <article class="cast-card">
+              <article
+                class="cast-card"
+                data-cast-url="<%= cast.url %>"
+                data-cast-type="<%= cast.resourceType %>"
+                data-cast-caption="<%= cast.caption %>"
+              >
                 <div class="media-frame">
-                  <span class="type-badge"><%= cast.resourceType %></span>
                   <% if (cast.resourceType === "image") { %>
                     <img src="<%= cast.url %>" alt="<%= cast.caption %>" />
                   <% } else if (cast.resourceType === "video") { %>
@@ -70,18 +73,138 @@
         <% } %>
       </main>
     </div>
-<script>
-  window.onload = function() {
-    // Delays the action by 1000 milliseconds (1 second)
-    setTimeout(function() {
-      window.scrollTo({
-        left: 0,
-        top: 700, // Increased 2.5x from 300 pixels
-        behavior: 'smooth'
+
+    <% if (casts.length > 0) { %>
+      <div class="cast-modal" data-cast-modal hidden>
+        <button class="cast-modal-close" data-cast-modal-close aria-label="Close cast preview">×</button>
+        <div class="cast-modal-panel">
+          <div class="cast-modal-media" data-cast-modal-media></div>
+          <div class="cast-modal-caption" data-cast-modal-caption></div>
+        </div>
+      </div>
+    <% } %>
+
+    <script>
+      const castGrid = document.querySelector("[data-cast-grid]");
+      const castModal = document.querySelector("[data-cast-modal]");
+      const modalMedia = document.querySelector("[data-cast-modal-media]");
+      const modalCaption = document.querySelector("[data-cast-modal-caption]");
+      const modalClose = document.querySelector("[data-cast-modal-close]");
+
+      if (castModal) {
+        castModal.hidden = true;
+      }
+
+      const openCastModal = (cast) => {
+        if (!castModal || !modalMedia || !modalCaption) return;
+
+        modalMedia.innerHTML = "";
+        modalCaption.textContent = cast.caption || "";
+
+        if (cast.resourceType === "image") {
+          const image = document.createElement("img");
+          image.src = cast.url;
+          image.alt = cast.caption || "Cast image";
+          modalMedia.appendChild(image);
+        } else if (cast.resourceType === "video") {
+          const video = document.createElement("video");
+          video.src = cast.url;
+          video.controls = true;
+          video.preload = "metadata";
+          video.autoplay = true;
+          modalMedia.appendChild(video);
+        } else {
+          const fileLink = document.createElement("a");
+          fileLink.href = cast.url;
+          fileLink.target = "_blank";
+          fileLink.rel = "noopener noreferrer";
+          fileLink.className = "file-preview file-preview--modal";
+          fileLink.innerHTML = "<strong>Open file</strong>";
+          modalMedia.appendChild(fileLink);
+        }
+
+        castModal.hidden = false;
+        castModal.setAttribute("aria-hidden", "false");
+        castModal.style.display = "grid";
+        document.body.classList.add("modal-open");
+      };
+
+      const closeCastModal = () => {
+        if (!castModal) return;
+        castModal.hidden = true;
+        castModal.setAttribute("aria-hidden", "true");
+        castModal.style.display = "none";
+        document.body.classList.remove("modal-open");
+        if (modalMedia) modalMedia.innerHTML = "";
+      };
+
+      if (castGrid && castGrid.children.length > 0) {
+        const cards = Array.from(castGrid.children);
+        let currentColumnCount = 0;
+
+        const getColumnCount = () => {
+          if (window.matchMedia("(max-width: 620px)").matches) return 1;
+          if (window.matchMedia("(max-width: 980px)").matches) return 2;
+          return 5;
+        };
+
+        const arrangeCasts = () => {
+          const columnCount = getColumnCount();
+
+          if (columnCount === currentColumnCount) return;
+
+          currentColumnCount = columnCount;
+          castGrid.textContent = "";
+
+          const columns = Array.from({ length: columnCount }, () => {
+            const column = document.createElement("div");
+            column.className = "cast-column";
+            castGrid.appendChild(column);
+            return column;
+          });
+
+          cards.forEach((card, index) => {
+            columns[index % columnCount].appendChild(card);
+          });
+        };
+
+        cards.forEach((card) => {
+          card.addEventListener("click", (event) => {
+            if (event.target.closest("a")) return;
+
+            openCastModal({
+              url: card.dataset.castUrl,
+              resourceType: card.dataset.castType,
+              caption: card.dataset.castCaption,
+            });
+          });
+        });
+
+        arrangeCasts();
+        window.addEventListener("resize", arrangeCasts);
+      }
+
+      if (modalClose) {
+        modalClose.addEventListener("click", closeCastModal);
+      }
+
+      if (castModal) {
+        castModal.style.display = "none";
+        castModal.setAttribute("aria-hidden", "true");
+
+        castModal.addEventListener("click", (event) => {
+          if (event.target === castModal) {
+            closeCastModal();
+          }
+        });
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && castModal && !castModal.hidden) {
+          closeCastModal();
+        }
       });
-    }, 1000); 
-  };
-</script>
+    </script>
 
   </body>
 </html>
