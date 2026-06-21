@@ -18,26 +18,6 @@
       </header>
 
       <main>
-        <section class="hero-panel home-hero">
-          <div class="hero-content">
-            <h1>Cast into the void</h1>
-          </div>
-
-          <div class="hero-stats" aria-label="Upload stats">
-
-          </div>
-        </section>
-
-        <% if (casts.length === 0) { %>
-          <section class="empty-state">
-            <div>
-              <p class="eyebrow">No signal found</p>
-              <h2>No uploads yet.</h2>
-            </div>
-            <a class="action-link" href="/Add-cast">Create first cast</a>
-          </section>
-        <% } %>
-
         <% if (casts.length > 0) { %>
           <section class="library-header">
             <div>
@@ -57,7 +37,10 @@
                   <% if (cast.resourceType === "image") { %>
                     <img src="<%= cast.url %>" alt="<%= cast.caption %>" />
                   <% } else if (cast.resourceType === "video") { %>
-                    <video src="<%= cast.url %>" controls preload="metadata"></video>
+                    <div class="video-preview-shell">
+                      <video src="<%= cast.url %>" preload="metadata" playsinline muted></video>
+                      <button class="video-play-button" type="button" aria-label="Play video">▶</button>
+                    </div>
                   <% } else { %>
                     <a class="file-preview" href="<%= cast.url %>" target="_blank">
                       <strong>Open file</strong>
@@ -95,9 +78,19 @@
         castModal.hidden = true;
       }
 
+      const pauseAllGridVideos = () => {
+        if (!castGrid) return;
+
+        castGrid.querySelectorAll("video").forEach((video) => {
+          video.pause();
+          video.currentTime = 0;
+        });
+      };
+
       const openCastModal = (cast) => {
         if (!castModal || !modalMedia || !modalCaption) return;
 
+        pauseAllGridVideos();
         modalMedia.innerHTML = "";
         modalCaption.textContent = cast.caption || "";
 
@@ -112,6 +105,7 @@
           video.controls = true;
           video.preload = "metadata";
           video.autoplay = true;
+          video.playsInline = true;
           modalMedia.appendChild(video);
         } else {
           const fileLink = document.createElement("a");
@@ -131,6 +125,13 @@
 
       const closeCastModal = () => {
         if (!castModal) return;
+
+        const modalVideo = modalMedia ? modalMedia.querySelector("video") : null;
+        if (modalVideo) {
+          modalVideo.pause();
+          modalVideo.currentTime = 0;
+        }
+
         castModal.hidden = true;
         castModal.setAttribute("aria-hidden", "true");
         castModal.style.display = "none";
@@ -169,8 +170,53 @@
         };
 
         cards.forEach((card) => {
+          const cardVideo = card.querySelector("video");
+          const playButton = card.querySelector(".video-play-button");
+
+          if (cardVideo && playButton) {
+            const updateButtonState = () => {
+              playButton.textContent = cardVideo.paused ? "▶" : "❚❚";
+              playButton.setAttribute(
+                "aria-label",
+                cardVideo.paused ? "Play video" : "Pause video"
+              );
+            };
+
+            playButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              if (cardVideo.paused) {
+                cardVideo.muted = false;
+                cardVideo.play().catch(() => {
+                  cardVideo.muted = true;
+                  cardVideo.play().catch(() => {});
+                });
+              } else {
+                cardVideo.pause();
+              }
+            });
+
+            cardVideo.addEventListener("play", updateButtonState);
+            cardVideo.addEventListener("pause", updateButtonState);
+            cardVideo.addEventListener("ended", updateButtonState);
+            updateButtonState();
+          }
+
+          if (cardVideo) {
+            cardVideo.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              openCastModal({
+                url: card.dataset.castUrl,
+                resourceType: card.dataset.castType,
+                caption: card.dataset.castCaption,
+              });
+            });
+          }
+
           card.addEventListener("click", (event) => {
-            if (event.target.closest("a")) return;
+            if (event.target.closest("a, .video-play-button, video")) return;
 
             openCastModal({
               url: card.dataset.castUrl,
