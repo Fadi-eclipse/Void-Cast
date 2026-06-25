@@ -6,16 +6,14 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqccntlcw";
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
 //setting up the server using express
 const app = express();
 const port = process.env.PORT || 2000;
 
 //db connection
-const dbURI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://fadikaizen:zxcvbnm123@auth-cluster.1nfzlys.mongodb.net/?appName=auth-cluster";
+const dbURI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
   await mongoose.connect(dbURI);
