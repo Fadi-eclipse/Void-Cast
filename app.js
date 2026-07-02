@@ -74,7 +74,7 @@ app.use(cookieParser());
 
 //page routes
 
-app.get("/{*path}", checkUser);
+app.use(checkUser);
 app.get("/", requireAuth, async (req, res) => {
   try {
     const casts = await getCloudinaryCasts();
@@ -146,17 +146,19 @@ app.post("/", (req, res) => {
   res.status(410).send("Uploads must go directly to Cloudinary.");
 });
 
-if (process.env.NODE_ENV !== "production") {
-  connectDB()
-    .then(() => {
+connectDB()
+  .then(() => {
+    if (process.env.NODE_ENV !== "production") {
       app.listen(port, () => {
         console.log(`listening on port ${port}`);
       });
-    })
-    .catch((error) => {
-      console.error("Connection error:", error);
+    }
+  })
+  .catch((error) => {
+    console.error("Connection error:", error);
+    if (process.env.NODE_ENV !== "production") {
       process.exit(1);
-    });
-}
+    }
+  });
 
 module.exports = app;
