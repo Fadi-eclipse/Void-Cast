@@ -5,6 +5,8 @@ const path = require("path");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const { requireAuth, checkUser } = require("./middleware/authMiddleware");
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
@@ -68,9 +70,12 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 //page routes
-app.get("/", async (req, res) => {
+
+app.get("/{*path}", checkUser);
+app.get("/", requireAuth, async (req, res) => {
   try {
     const casts = await getCloudinaryCasts();
     res.render("index", { title: "home", casts });
@@ -80,7 +85,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/Add-cast", (req, res) => {
+app.get("/Add-cast", requireAuth, (req, res) => {
   res.render("add", {
     title: "New cast",
     cloudName,
@@ -122,6 +127,20 @@ app.post("/cloudinary-signature", (req, res) => {
 });
 
 app.use(authRoutes);
+
+app.get("/set-cookies", (req, res) => {
+  res.cookie("newUser", false);
+  res.cookie("isEmployee", true, {
+    maxAge: 1000 * 60 * 60 * 24 * 2,
+    httpOnly: true,
+  });
+
+  res.send("you got the cookies");
+});
+app.get("/read-cookies", (req, res) => {
+  const cookies = req.cookies;
+  console.log(cookies.newUser);
+});
 
 app.post("/", (req, res) => {
   res.status(410).send("Uploads must go directly to Cloudinary.");

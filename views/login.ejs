@@ -8,17 +8,14 @@
   </head>
 
   <body>
+    <header class="site-header">
+      <a class="brand">
+        <span class="brand-name"><span>Void</span> <span>Cast</span></span>
+      </a>
+    </header>
     <div class="page-shell auth-shell">
-      <header class="site-header">
-        <a class="brand" href="/">
-          <span class="brand-name"><span>Void</span> <span>Cast</span></span>
-        </a>
-
-        <a class="ghost-link" href="/signup">Sign up</a>
-      </header>
-
       <main class="auth-layout">
-        <form class="auth-form" action="/login" method="POST">
+        <form class="auth-form">
           <div class="auth-form-header">
             <h2>Login to void Cast</h2>
           </div>
@@ -32,16 +29,18 @@
             autocomplete="email"
             required
           />
+          <div class="email-error"></div>
 
           <label for="password">Password</label>
           <input
             id="password"
             type="password"
             name="password"
-            placeholder="Your password"
-            autocomplete="current-password"
+            placeholder="Choose a password"
+            autocomplete="new-password"
             required
           />
+          <div class="password-error"></div>
 
           <button type="submit">Login</button>
 
@@ -52,5 +51,41 @@
         </form>
       </main>
     </div>
+
+    <script>
+      const form = document.querySelector("form");
+      const emailError = document.querySelector(".email-error");
+      const passwordError = document.querySelector(".password-error");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        emailError.textContent = "";
+        passwordError.textContent = "";
+
+        // get the values
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            body: JSON.stringify({ email, password }),
+            headers: { "Content-type": "application/json" },
+          });
+          const data = await res.json();
+          console.log(data);
+          if (data.errors) {
+            emailError.textContent = data.errors.email;
+            passwordError.textContent = data.errors.password;
+          }
+          if (data.user) {
+            window.location.href = "/";
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    </script>
   </body>
 </html>

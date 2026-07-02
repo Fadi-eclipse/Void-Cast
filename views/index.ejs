@@ -14,7 +14,13 @@
           <span class="brand-name"><span>Void</span> <span>Cast</span></span>
         </a>
 
-        <a class="action-link" href="/Add-cast">Add cast</a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <% if (user) { %>
+          <li class="action-link">Welcome, <%= user.email %></li>
+          <a class="action-link" href="/Add-cast">Add cast</a>
+          <a class="action-link" href="/logout">log out</a>
+          <% } %>
+        </nav>
       </header>
 
       <main>
